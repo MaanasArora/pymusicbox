@@ -1,8 +1,8 @@
 import numpy as np
 
-from museai.audio.audio_utils import add_audio
+from pymusicbox.audio.audio_utils import add_audio
 
-from museai.symbolic.symbols import Note, Track
+from pymusicbox.symbolic.symbols import Note, Track
 
 
 class Instrument:
@@ -18,7 +18,7 @@ class Instrument:
         return data
 
     def render_track(self, track: Track):
-        data = np.linspace(0, track.length, int(track.length*self.sample_rate))
+        data = np.zeros((int(track.length*self.sample_rate),))
 
         for time, note in track.get_timed_notes():
             add_audio(time, data, self.render_note(note), self.sample_rate)
