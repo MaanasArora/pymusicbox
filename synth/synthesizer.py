@@ -3,4 +3,4 @@ class Synthesizer:
         self.instrument = instrument
 
     def write_file(self):
-        
+        pass
