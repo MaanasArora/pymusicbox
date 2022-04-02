@@ -1,3 +1,7 @@
-output.wav
+# python
 venv
 __pycache__
+
+# scratch files
+scratch/
+output.wav

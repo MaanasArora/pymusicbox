@@ -1,8 +1,8 @@
 import numpy as np
 
-from audio.audio_utils import add_audio
+from museai.audio.audio_utils import add_audio
 
-from symbolic.symbolic import Note, Track
+from museai.symbolic.symbols import Note, Track
 
 
 class Instrument:
