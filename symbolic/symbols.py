@@ -2,11 +2,22 @@ import numpy as np
 
 
 class Note:
-    def __init__(self, note, length=1, velocity=127):
-        self.note = note
+    def __init__(self, pitch, octave, length=1, velocity=127):
+        self.pitch = pitch
+        self.octave = octave
+        self.note = self.get_note()
+
         self.length = length
+
         self.velocity = velocity
         self.level = self.velocity / 127
+
+    def get_note(self):
+        pitch_dict = {p: i for i, p in enumerate(
+            ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'G', 'G#'])}
+
+        note = 1 + pitch_dict[self.pitch.upper()] + 12 * self.octave
+        return note
 
 
 class Track:
