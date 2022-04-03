@@ -14,7 +14,7 @@ class Note:
 
     def get_note(self):
         pitch_dict = {p: i for i, p in enumerate(
-            ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'G', 'G#'])}
+            ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'])}
 
         note = 1 + pitch_dict[self.pitch.upper()] + 12 * self.octave
         return note
