@@ -8,7 +8,7 @@ from pymusicbox.symbolic.symbols import Note, Track
 class Instrument:
     def __init__(self, sample_rate=44100, harmonics=None):
         self.sample_rate = sample_rate
-        self.max_amp = 4000
+        self.max_amp = 9000
 
         self.harmonics_enabled = False
 
