@@ -27,7 +27,7 @@ class Instrument:
         atk = np.linspace(0, 1, int(self.attack_length * self.sample_rate))
         dec = np.linspace(1, self.sustain_factor, int(
             self.decay_length * self.sample_rate))
-        sus = np.linspace(self.sustain_factor, self.sustain_factor, int(
+        sus = np.linspace(self.sustain_factor, self.sustain_factor, np.math.ceil(
             sustain_length * self.sample_rate))
         rls = np.linspace(self.sustain_factor, 0, int(
             self.release_length * self.sample_rate))
