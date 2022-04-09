@@ -2,7 +2,7 @@ import numpy as np
 
 from pymusicbox.audio.audio_utils import add_audio
 
-from pymusicbox.symbolic.symbols import Note, Track
+from pymusicbox.symbolic.core import Note, Track
 
 
 class Instrument:

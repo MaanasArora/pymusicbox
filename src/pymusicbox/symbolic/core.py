@@ -1,5 +1,7 @@
 import numpy as np
 
+from pymusicbox.symbolic.constants import pitch_names
+
 
 class Note:
     def __init__(self, pitch, octave, length=1, velocity=127):
@@ -13,8 +15,7 @@ class Note:
         self.level = self.velocity / 127
 
     def get_note(self):
-        pitch_dict = {p: i for i, p in enumerate(
-            ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'])}
+        pitch_dict = {p: i for i, p in enumerate(pitch_names)}
 
         note = 1 + pitch_dict[self.pitch.upper()] + 12 * self.octave
         return note
