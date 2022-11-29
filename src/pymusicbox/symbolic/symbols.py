@@ -1,6 +1,10 @@
 import numpy as np
 
 
+NOTES = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
+NOTES_PITCH = {p: i + 1 for i, p in enumerate(NOTES)}
+
+
 class Note:
     def __init__(self, pitch, octave, length=1, velocity=127):
         self.pitch = pitch
@@ -13,10 +17,7 @@ class Note:
         self.level = self.velocity / 127
 
     def get_note(self):
-        pitch_dict = {p: i for i, p in enumerate(
-            ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'])}
-
-        note = 1 + pitch_dict[self.pitch.upper()] + 12 * self.octave
+        note = NOTES_PITCH[self.pitch.upper()] + 12 * self.octave
         return note
 
 
