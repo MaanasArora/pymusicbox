@@ -1,46 +1,62 @@
-from collections import namedtuple
+from dataclasses import astuple, dataclass
 
 import numpy as np
 
-from pymusicbox.audio.audio_utils import add_audio
-from pymusicbox.symbolic.symbols import Note, Track
+from pymusicbox.audio.audio import Audio
+from pymusicbox.symbolic.symbols import Note, NoteEvent, Track
 
 
-HarmonicsConfiguration = namedtuple("HarmonicsConfiguration", ["attack", "decay", "release", "sustain"])
+@dataclass
+class HarmonicsConfiguration:
+    attack: float
+    decay: float
+    release: float
+    sustain_factor: float
+
+    def __iter__(self):
+        return iter(astuple(self))
+
+    def apply_rate(self, sample_rate):
+        return map(lambda time: int(sample_rate * time), self)
 
 
+@dataclass
 class Instrument:
-    def __init__(self, sample_rate: int = 44100, harmonics: HarmonicsConfiguration = None):
-        self.sample_rate = sample_rate
-        self.max_amp = 9000
+    sample_rate: int = 44100
+    harmonics: HarmonicsConfiguration = None
+    max_amp: float = 1e-5
 
-        self.harmonics = harmonics
-
-    def get_harmonics(self, length: float):
-        attack, decay, release, sustain_factor = self.harmonics
+    def get_harmonic_amps(self, length: float):
+        attack, decay, release, sustain_factor = self.harmonics.apply_rate(self.sample_rate)
         sustain = length - (attack + decay + release)
 
-        attack_amp = np.linspace(0, 1, int(attack * self.sample_rate))
-        decay_amp = np.linspace(1, sustain_factor, int(decay * self.sample_rate))
-        sustain_amp = np.linspace(sustain_factor, sustain_factor, int(sustain * self.sample_rate))
-        release_amp = np.linspace(self.sustain_factor, 0, int(release * self.sample_rate))
+        if sustain < 0:
+            raise ValueError("Length too small for harmonics")
+
+        attack_amp = np.linspace(0, 1, attack)
+        decay_amp = np.linspace(1, sustain_factor, decay)
+        sustain_amp = np.linspace(sustain_factor, sustain_factor, sustain)
+        release_amp = np.linspace(sustain_factor, 0, release)
 
         return np.concatenate([attack_amp, decay_amp, sustain_amp, release_amp])
 
     def render_note(self, note: Note):
+        note_length = note.length*self.sample_rate
+
         freq = 55 * pow(2, (note.note / 12))
-        t = np.linspace(0, note.length, int(note.length*self.sample_rate))
+        t = np.linspace(0, note.length, int(note_length))
 
         data = self.max_amp * note.level * np.sin(2. * np.pi * freq * t)
         if self.harmonics is not None:
-            data *= self.get_harmonics(note.length)
+            data *= self.get_harmonic_amps(note_length)
 
-        return data
+        return Audio(data, self.sample_rate)
 
     def render_track(self, track: Track):
-        data = np.zeros((int(track.length*self.sample_rate),))
+        audio = Audio.empty(track.length, self.sample_rate)
 
-        for time, note in track.get_timed_notes():
-            add_audio(time, data, self.render_note(note), self.sample_rate)
+        for event in track:
+            if isinstance(event, NoteEvent):
+                audio.add(event.time, self.render_note(event.note))
 
-        return data
+        return audio

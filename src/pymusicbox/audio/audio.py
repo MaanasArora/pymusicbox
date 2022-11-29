@@ -9,8 +9,8 @@ class Audio:
     sample_rate: int
 
     @classmethod
-    def empty(length, sample_rate):
-        return Audio(np.zeros((length,)), sample_rate)
+    def empty(cls, length, sample_rate):
+        return Audio(np.zeros((length*sample_rate,)), sample_rate)
 
     def add(self, time, audio):
         t_start = int(time * self.sample_rate)

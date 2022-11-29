@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import numpy as np
 
 
@@ -5,38 +6,45 @@ NOTES = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
 NOTES_PITCH = {p: i + 1 for i, p in enumerate(NOTES)}
 
 
+@dataclass
 class Note:
-    def __init__(self, pitch, octave, length=1, velocity=127):
-        self.pitch = pitch
-        self.octave = octave
-        self.note = self.get_note()
+    pitch: str
+    octave: int
+    length: float
+    velocity: int
 
-        self.length = length
+    def __post_init__(self):
+        pitch_upper = self.pitch.upper()
+        if pitch_upper not in NOTES_PITCH:
+            raise ValueError(f"Invalid pitch: {self.pitch}")
+        self.note = NOTES_PITCH[pitch_upper] + 12 * self.octave
 
-        self.velocity = velocity
+        if self.velocity > 127 or self.velocity < 1:
+            raise ValueError("Velocity must be between 1..127")
         self.level = self.velocity / 127
 
-    def get_note(self):
-        note = NOTES_PITCH[self.pitch.upper()] + 12 * self.octave
-        return note
+
+@dataclass
+class Event:
+    time: float
 
 
+@dataclass
+class NoteEvent(Event):
+    note: Note
+
+
+@dataclass
 class Track:
-    def __init__(self, times, notes, length=None):
-        self.times = times
-        self.notes = notes
+    events: list[Event]
+    length: float = None
 
-        if length is None:
-            self.length = self.get_length()
+    def __post_init__(self):
+        if self.length is None:
+            last_event = max(self.events,
+                             key=lambda event: event.time)
 
-    def get_length(self):
-        max_indx = np.argmax(self.times)
+            self.length = last_event.time + last_event.note.length
 
-        max_time = self.times[max_indx]
-        max_note_length = self.notes[max_indx].length
-
-        return max_time + max_note_length
-
-    def get_timed_notes(self):
-        for i in range(len(self.times)):
-            yield self.times[i], self.notes[i]
+    def __iter__(self):
+        return iter(self.events)
