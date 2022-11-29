@@ -1,45 +1,38 @@
+from collections import namedtuple
+
 import numpy as np
 
 from pymusicbox.audio.audio_utils import add_audio
-
 from pymusicbox.symbolic.symbols import Note, Track
 
 
+HarmonicsConfiguration = namedtuple("HarmonicsConfiguration", ["attack", "decay", "release", "sustain"])
+
+
 class Instrument:
-    def __init__(self, sample_rate=44100, harmonics=None):
+    def __init__(self, sample_rate: int = 44100, harmonics: HarmonicsConfiguration = None):
         self.sample_rate = sample_rate
         self.max_amp = 9000
 
-        self.harmonics_enabled = False
+        self.harmonics = harmonics
 
-        if harmonics is not None:
-            self.attack_length = harmonics['atk']
-            self.decay_length = harmonics['dec']
-            self.release_length = harmonics['rls']
-            self.sustain_factor = harmonics['sus_factor']
+    def get_harmonics(self, length: float):
+        attack, decay, release, sustain_factor = self.harmonics
+        sustain = length - (attack + decay + release)
 
-            self.harmonics_enabled = True
+        attack_amp = np.linspace(0, 1, int(attack * self.sample_rate))
+        decay_amp = np.linspace(1, sustain_factor, int(decay * self.sample_rate))
+        sustain_amp = np.linspace(sustain_factor, sustain_factor, int(sustain * self.sample_rate))
+        release_amp = np.linspace(self.sustain_factor, 0, int(release * self.sample_rate))
 
-    def get_harmonics(self, length):
-        sustain_length = length - \
-            (self.attack_length + self.decay_length + self.release_length)
-
-        atk = np.linspace(0, 1, int(self.attack_length * self.sample_rate))
-        dec = np.linspace(1, self.sustain_factor, int(
-            self.decay_length * self.sample_rate))
-        sus = np.linspace(self.sustain_factor, self.sustain_factor, int(
-            sustain_length * self.sample_rate))
-        rls = np.linspace(self.sustain_factor, 0, int(
-            self.release_length * self.sample_rate))
-
-        return np.concatenate([atk, dec, sus, rls])
+        return np.concatenate([attack_amp, decay_amp, sustain_amp, release_amp])
 
     def render_note(self, note: Note):
         freq = 55 * pow(2, (note.note / 12))
         t = np.linspace(0, note.length, int(note.length*self.sample_rate))
 
         data = self.max_amp * note.level * np.sin(2. * np.pi * freq * t)
-        if self.harmonics_enabled:
+        if self.harmonics is not None:
             data *= self.get_harmonics(note.length)
 
         return data
