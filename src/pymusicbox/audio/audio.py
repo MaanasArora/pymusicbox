@@ -2,6 +2,8 @@ from dataclasses import dataclass
 
 import numpy as np
 
+import soundfile
+
 
 @dataclass
 class Audio:
@@ -20,6 +22,9 @@ class Audio:
 
     def duration(self):
         return len(self.waveform) / self.sample_rate
+
+    def write(self, filename):
+        soundfile.write(filename, self.waveform, self.sample_rate)
 
     def __len__(self):
         return len(self.waveform)
