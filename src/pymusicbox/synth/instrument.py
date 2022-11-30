@@ -37,33 +37,34 @@ class HarmonicsConfiguration:
     release: float
     sustain_factor: float
 
-    def __iter__(self):
-        return iter(astuple(self))
+    def lengths(self, length):
+        if length < self.attack + self.decay + self.release:
+            raise ValueError("Length too small for harmonics")
 
-    def apply_rate(self, sample_rate):
-        return map(lambda time: int(sample_rate * time), self)
+        return (length * np.array([
+            self.attack,
+            self.decay,
+            1 - self.attack - self.decay - self.release,
+            self.release
+        ])).astype(np.int64)
+
+    def amplitude_envelope(self, length, max_amplitude=1):
+        attack_length, decay_length, sustain_length, release_length = self.lengths(length)
+
+        attack = np.linspace(0, max_amplitude, attack_length)
+        decay = np.linspace(max_amplitude, self.sustain_factor, decay_length)
+        sustain = np.ones(sustain_length) * self.sustain_factor
+        release = np.linspace(self.sustain_factor, max_amplitude, release_length)
+
+        return np.concatenate((attack, decay, sustain, release))
 
 
 @dataclass
 class HarmonicInstrument(Instrument):
     harmonics: HarmonicsConfiguration = None
 
-    def get_harmonic_amps(self, length: float):
-        attack, decay, release, sustain_factor = self.harmonics.apply_rate(self.sample_rate)
-        sustain = length - (attack + decay + release)
-
-        if sustain < 0:
-            raise ValueError("Length too small for harmonics")
-
-        attack_amp = np.linspace(0, 1, attack)
-        decay_amp = np.linspace(1, sustain_factor, decay)
-        sustain_amp = np.linspace(sustain_factor, sustain_factor, sustain)
-        release_amp = np.linspace(sustain_factor, 0, release)
-
-        return np.concatenate([attack_amp, decay_amp, sustain_amp, release_amp])
-
     def render_note(self, note: Note):
         audio = super().render_note(note)
 
-        audio.waveform *= self.get_harmonic_amps(note.length * self.sample_rate)
+        audio.waveform *= self.harmonics.amplitude_envelope(len(audio))
         return audio
