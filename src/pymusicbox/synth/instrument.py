@@ -9,7 +9,7 @@ from pymusicbox.symbolic.symbols import Note, NoteEvent, Track
 @dataclass
 class Instrument:
     sample_rate: int = 44100
-    max_amp: float = 1e-5
+    max_amp: float = 1e-1
 
     def render_note(self, note: Note):
         note_length = note.length*self.sample_rate
