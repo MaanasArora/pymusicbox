@@ -4,10 +4,11 @@ import numpy as np
 
 from pymusicbox.audio.audio import Audio
 from pymusicbox.symbolic.symbols import Note, NoteEvent, Track
+from pymusicbox.synth.instrument import AdditiveInstrument
 
 
 @dataclass
-class Instrument:
+class Oscillator(AdditiveInstrument):
     sample_rate: int = 44100
     max_amp: float = 1e-1
 
@@ -60,7 +61,7 @@ class HarmonicsConfiguration:
 
 
 @dataclass
-class HarmonicInstrument(Instrument):
+class HarmonicOscillator(Oscillator):
     harmonics: HarmonicsConfiguration = None
 
     def render_note(self, note: Note):
