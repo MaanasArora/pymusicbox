@@ -42,12 +42,16 @@ class HarmonicsConfiguration:
         if length < self.attack + self.decay + self.release:
             raise ValueError("Length too small for harmonics")
 
-        return (length * np.array([
+        lengths = (length * np.array([
             self.attack,
             self.decay,
             1 - self.attack - self.decay - self.release,
             self.release
         ])).astype(np.int64)
+
+        lengths[-1] += length - lengths.sum()
+        
+        return lengths
 
     def amplitude_envelope(self, length, max_amplitude=1):
         attack_length, decay_length, sustain_length, release_length = self.lengths(length)
@@ -68,4 +72,5 @@ class HarmonicOscillator(Oscillator):
         audio = super().render_note(note)
 
         audio.waveform *= self.harmonics.amplitude_envelope(len(audio))
+
         return audio
