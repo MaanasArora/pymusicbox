@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import numpy as np
 
 
-NOTES = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
+NOTES = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
 NOTES_PITCH = {p: i + 1 for i, p in enumerate(NOTES)}
 
 
@@ -41,8 +41,9 @@ class Track:
 
     def __post_init__(self):
         if self.length is None:
-            last_event = max(self.events,
-                             key=lambda event: event.time)
+            last_event = max(
+                self.events, key=lambda event: (event.time, event.note.length)
+            )
 
             self.length = last_event.time + last_event.note.length
 

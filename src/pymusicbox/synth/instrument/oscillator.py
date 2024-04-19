@@ -59,7 +59,7 @@ class HarmonicsConfiguration:
         attack = np.linspace(0, max_amplitude, attack_length)
         decay = np.linspace(max_amplitude, self.sustain_factor, decay_length)
         sustain = np.ones(sustain_length) * self.sustain_factor
-        release = np.linspace(self.sustain_factor, max_amplitude, release_length)
+        release = np.linspace(self.sustain_factor, 0.0, release_length)
 
         return np.concatenate((attack, decay, sustain, release))
 
