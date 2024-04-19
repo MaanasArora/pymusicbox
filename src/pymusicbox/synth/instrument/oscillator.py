@@ -4,7 +4,7 @@ import numpy as np
 
 from pymusicbox.audio.audio import Audio
 from pymusicbox.symbolic.symbols import Note, NoteEvent, Track
-from pymusicbox.synth.instrument import AdditiveInstrument
+from pymusicbox.synth.instrument.instrument import AdditiveInstrument
 
 
 @dataclass
