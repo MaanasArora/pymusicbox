@@ -28,5 +28,14 @@ class Audio:
     def write(self, filename):
         soundfile.write(filename, self.waveform, self.sample_rate)
 
+    def __mul__(self, other):
+        if isinstance(other, int):
+            other = float(other)
+
+        if isinstance(other, float):
+            return Audio(self.waveform * other, self.sample_rate)
+
+        raise ValueError(f"Cannot multiply Audio by {type(other)}")
+
     def __len__(self):
         return len(self.waveform)

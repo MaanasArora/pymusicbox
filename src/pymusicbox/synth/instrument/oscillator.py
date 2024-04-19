@@ -71,6 +71,6 @@ class HarmonicOscillator(Oscillator):
     def render_note(self, note: Note):
         audio = super().render_note(note)
 
-        audio.waveform *= self.harmonics.amplitude_envelope(len(audio))
+        audio *= self.harmonics.amplitude_envelope(len(audio))
 
         return audio
