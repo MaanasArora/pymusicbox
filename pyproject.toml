@@ -2,8 +2,8 @@
 requires = ["setuptools>=42"]
 build-backend = "setuptools.build_meta"
 dependencies = [
-    "cffi==1.15.1"
-    "numpy==1.23.5"
-    "pycparser==2.21"
-    "soundfile==0.11.0"
+    "cffi==1.15.1",
+    "numpy==1.23.5",
+    "pycparser==2.21",
+    "soundfile==0.11.0",
 ]
